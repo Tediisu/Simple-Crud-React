@@ -1,0 +1,177 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #F7F5F0;
+  color: #1A1D23;
+  min-height: 100vh;
+}
+
+h1, h2 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+}
+
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+/* Login */
+.auth-card {
+  text-align: center;
+  max-width: 360px;
+  border-radius: 20px;
+  margin: 80px auto;
+  padding: 40px 32px;
+  background: #fff;
+  border: 1px solid #E8E4DA;
+}
+
+.auth-card h2 {
+  font-size: 28px;
+  margin-bottom: 24px;
+}
+
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.error-text {
+  color: #C4491D;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+/* Inputs */
+input {
+  padding: 10px 12px;
+  border: 1px solid #C9C4B6;
+  background: #fff;
+  font-size: 15px;
+  font-family: inherit;
+}
+
+input:focus {
+  outline: 2px solid #3D5A5B;
+  outline-offset: 1px;
+  border-color: #3D5A5B;
+}
+
+button {
+  padding: 10px 16px;
+  background: #3D5A5B;
+  color: #fff;
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+button:hover {
+  background: #2E4546;
+}
+
+/* Students page */
+.students-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 32px;
+  border-bottom: 2px solid #1A1D23;
+  padding-bottom: 12px;
+}
+
+.students-header h2 {
+  font-size: 26px;
+}
+
+.student-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.student-form input {
+  flex: 1;
+  min-width: 140px;
+}
+
+.student-list {
+  list-style: none;
+  border-top: 1px solid #C9C4B6;
+}
+
+.student-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #C9C4B6;
+}
+
+.student-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.student-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.student-meta {
+  font-size: 13px;
+  color: #5A5A52;
+}
+
+.student-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.student-actions button {
+  padding: 6px 12px;
+  font-size: 13px;
+  background: transparent;
+  color: #3D5A5B;
+  border: 1px solid #3D5A5B;
+}
+
+.student-actions button:hover {
+  background: #3D5A5B;
+  color: #fff;
+}
+
+.student-actions .delete-btn {
+  color: #C4491D;
+  border-color: #C4491D;
+}
+
+.student-actions .delete-btn:hover {
+  background: #C4491D;
+  color: #fff;
+}
+
+.empty-state {
+  padding: 32px 0;
+  text-align: center;
+  color: #5A5A52;
+  font-size: 14px;
+}
+
+.button {
+  height: 30px;
+  width: 50px;
+  background: #C4491D;
+}
