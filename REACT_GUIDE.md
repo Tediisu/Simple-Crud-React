@@ -302,9 +302,11 @@ import { logout } from '../auth/authSlice';
 
 export default function StudentList() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { items, status } = useAppSelector((state) => state.students);
   const [form, setForm] = useState({ name: '', email: '', course: '' });
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchStudents());
@@ -319,6 +321,7 @@ export default function StudentList() {
       dispatch(addStudent(form));
     }
     setForm({ name: '', email: '', course: '' });
+    setIsModalOpen(false);
   };
 
   const startEdit = (id: number) => {
@@ -326,7 +329,14 @@ export default function StudentList() {
     if (student) {
       setForm({ name: student.name, email: student.email, course: student.course });
       setEditingId(id);
+      setIsModalOpen(true);
     }
+  };
+  
+  const openAddModal = () => {
+    setForm({ name: '', email: '', course: '' });
+    setEditingId(null);
+    setIsModalOpen(true);
   };
 
   const handleLogout = () => {
@@ -338,18 +348,14 @@ export default function StudentList() {
     <div className="page">
       <div className="students-header">
         <h2>Students</h2>
-        <div className="button" onClick={handleLogout}></div>
+        <button className="logout-btn" onClick={handleLogout}>Logout</button>
       </div>
 
-      <form className="student-form" onSubmit={handleSubmit}>
-        <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Name" />
-        <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="Email" />
-        <input value={form.course} onChange={(e) => setForm({ ...form, course: e.target.value })} placeholder="Course" />
-        <button type="submit">{editingId !== null ? 'Update' : 'Add'}</button>
-      </form>
+      <div className="toolbar">
+        <button onClick={openAddModal}>Add Student</button>
+      </div>
 
-      {status === 'loading' && <p className="empty-state">Loading…</p>}
-      {status !== 'loading' && items.length === 0 && <p className="empty-state">No students yet.</p>}
+      {items.length === 0 && <p className="empty-state">No students yet.</p>}
 
       <ul className="student-list">
         {items.map((s) => (
@@ -365,6 +371,32 @@ export default function StudentList() {
           </li>
         ))}
       </ul>
+
+    {isModalOpen && (
+      <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <button className="modal-close" onClick={() => setIsModalOpen(false)} aria-label="Close">×</button>
+          <h3>{editingId !== null ? 'Edit Student' : 'Add Student'}</h3>
+          <form className="student-form" onSubmit={handleSubmit}>
+            <label>
+              Name
+              <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            </label>
+            <label>
+              Email
+              <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+            </label>
+            <label>
+              Course
+              <input value={form.course} onChange={(e) => setForm({ ...form, course: e.target.value })} />
+            </label>
+            <div className="modal-actions">
+              <button type="submit">{editingId !== null ? 'Update' : 'Add'}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )}
     </div>
   );
 }
@@ -426,6 +458,9 @@ createRoot(document.getElementById('root')!).render(
 ## Step 7 — Styling — `src/index.css`
 
 ```css
+/* ============================
+   Reset & Base
+   ============================ */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -444,39 +479,9 @@ h1, h2 {
   font-weight: 400;
 }
 
-.page {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 48px 24px;
-}
-
-/* Login */
-.auth-card {
-  max-width: 360px;
-  margin: 80px auto;
-  padding: 40px 32px;
-  background: #fff;
-  border: 1px solid #E8E4DA;
-}
-
-.auth-card h2 {
-  font-size: 28px;
-  margin-bottom: 24px;
-}
-
-.auth-card form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.error-text {
-  color: #C4491D;
-  font-size: 14px;
-  margin-bottom: 8px;
-}
-
-/* Inputs */
+/* ============================
+   Form elements (global)
+   ============================ */
 input {
   padding: 10px 12px;
   border: 1px solid #C9C4B6;
@@ -505,12 +510,53 @@ button:hover {
   background: #2E4546;
 }
 
-/* Students page */
+/* ============================
+   Page layout
+   ============================ */
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+/* ============================
+   Login
+   ============================ */
+.auth-card {
+  text-align: center;
+  max-width: 360px;
+  border-radius: 20px;
+  margin: 80px auto;
+  padding: 40px 32px;
+  background: #fff;
+  border: 1px solid #E8E4DA;
+}
+
+.auth-card h2 {
+  font-size: 28px;
+  margin-bottom: 24px;
+}
+
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.error-text {
+  color: #C4491D;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+/* ============================
+   Students page — header & toolbar
+   ============================ */
 .students-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 32px;
+  margin-bottom: 20px;
   border-bottom: 2px solid #1A1D23;
   padding-bottom: 12px;
 }
@@ -519,6 +565,25 @@ button:hover {
   font-size: 26px;
 }
 
+.logout-btn {
+  background: transparent;
+  color: #1A1D23;
+  border: 1px solid #C9C4B6;
+  font-size: 13px;
+  padding: 6px 12px;
+}
+
+.logout-btn:hover {
+  background: #F0EDE5;
+}
+
+.toolbar {
+  padding-bottom: 30px;
+}
+
+/* ============================
+   Student list
+   ============================ */
 .student-form {
   display: flex;
   gap: 8px;
@@ -595,9 +660,76 @@ button:hover {
   font-size: 14px;
 }
 
-.button {
-  height: 30px;
-  width: 50px;
-  background: #C4491D;
+/* ============================
+   Modal
+   ============================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 29, 35, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.modal-content {
+  position: relative;
+  background: #fff;
+  padding: 40px 32px;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+  box-shadow: 0 12px 40px rgba(26, 29, 35, 0.25), 0 2px 8px rgba(26, 29, 35, 0.1);
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #1A1D23;
+  font-size: 22px;
+  line-height: 1;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  color: #C4491D;
+}
+
+.modal-content h3 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.modal-content .student-form {
+  flex-direction: column;
+  margin-bottom: 0;
+  gap: 16px;
+}
+
+.modal-content label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: #5A5A52;
+}
+
+.modal-content input {
+  padding: 10px 12px;
+}
+
+.modal-actions {
+  padding: 16px 0 0;
+}
+
+.modal-actions button[type="submit"] {
+  width: 100%;
 }
 ```
