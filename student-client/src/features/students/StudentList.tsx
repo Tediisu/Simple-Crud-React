@@ -10,6 +10,7 @@ export default function StudentList() {
   const { items, status } = useAppSelector((state) => state.students);
   const [form, setForm] = useState({ name: '', email: '', course: '' });
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchStudents());
@@ -24,6 +25,7 @@ export default function StudentList() {
       dispatch(addStudent(form));
     }
     setForm({ name: '', email: '', course: '' });
+    setIsModalOpen(false);
   };
 
   const startEdit = (id: number) => {
@@ -31,8 +33,14 @@ export default function StudentList() {
     if (student) {
       setForm({ name: student.name, email: student.email, course: student.course });
       setEditingId(id);
+      setIsModalOpen(true);
     }
-    
+  };
+  
+  const openAddModal = () => {
+    setForm({ name: '', email: '', course: '' });
+    setEditingId(null);
+    setIsModalOpen(true);
   };
 
   const handleLogout = () => {
@@ -44,18 +52,14 @@ export default function StudentList() {
     <div className="page">
       <div className="students-header">
         <h2>Students</h2>
-        <div className="button" onClick={handleLogout}></div>
+        <button className="logout-btn" onClick={handleLogout}>Logout</button>
       </div>
 
-      <form className="student-form" onSubmit={handleSubmit}>
-        <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Name" />
-        <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="Email" />
-        <input value={form.course} onChange={(e) => setForm({ ...form, course: e.target.value })} placeholder="Course" />
-        <button type="submit">{editingId !== null ? 'Update' : 'Add'}</button>
-      </form>
+      <div className="toolbar">
+        <button onClick={openAddModal}>Add Student</button>
+      </div>
 
-      {status === 'loading' && <p className="empty-state">Loading…</p>}
-      {status !== 'loading' && items.length === 0 && <p className="empty-state">No students yet.</p>}
+      {items.length === 0 && <p className="empty-state">No students yet.</p>}
 
       <ul className="student-list">
         {items.map((s) => (
@@ -71,6 +75,32 @@ export default function StudentList() {
           </li>
         ))}
       </ul>
+
+    {isModalOpen && (
+      <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <button className="modal-close" onClick={() => setIsModalOpen(false)} aria-label="Close">×</button>
+          <h3>{editingId !== null ? 'Edit Student' : 'Add Student'}</h3>
+          <form className="student-form" onSubmit={handleSubmit}>
+            <label>
+              Name
+              <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            </label>
+            <label>
+              Email
+              <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+            </label>
+            <label>
+              Course
+              <input value={form.course} onChange={(e) => setForm({ ...form, course: e.target.value })} />
+            </label>
+            <div className="modal-actions">
+              <button type="submit">{editingId !== null ? 'Update' : 'Add'}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )}
     </div>
   );
 }
